@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Player : MonoBehaviour {
     private const float MAX_SPEED = 3;
@@ -9,6 +10,11 @@ public class Player : MonoBehaviour {
     private Rigidbody2D rb2d;
     private Animator animator;
 
+    // Stats
+    public const int MAX_HEALTH = 100;
+    public int curHealth;
+
+    // Movement
     public float delayBeforeDoubleJump;
     public float speed = 50f;
     public float jumpPower = 1;
@@ -20,6 +26,8 @@ public class Player : MonoBehaviour {
         rb2d = gameObject.GetComponent<Rigidbody2D>();
         animator = gameObject.GetComponent<Animator>();
         rb2d.freezeRotation = true;
+
+        curHealth = MAX_HEALTH;
 	}
 	
 	// Update is called once per frame
@@ -35,8 +43,14 @@ public class Player : MonoBehaviour {
             transform.localScale = new Vector3(1, 1, 1);
 
         // Jump handler
-        if (Input.GetButtonDown("Jump"))
+        if (Input.GetButtonDown("Jump") && !PauseMenu.isPaused && (grounded || canDoubleJump))
             Jump();
+
+        if (curHealth > MAX_HEALTH)
+            curHealth = MAX_HEALTH;
+
+        if (curHealth <= 0)
+            die();
     }
 
     private void FixedUpdate() {
@@ -68,19 +82,21 @@ public class Player : MonoBehaviour {
     }
 
     private void Jump() {
-        if (grounded) {
-            rb2d.AddForce(Vector2.up * jumpPower, ForceMode2D.Force);
-            Invoke("EnableDoubleJump", delayBeforeDoubleJump);
-        }
+        if (grounded)
+            canDoubleJump = true;
         if (canDoubleJump) {
             canDoubleJump = false;
             rb2d.velocity = new Vector2(rb2d.velocity.x, 0);
-            rb2d.AddForce(Vector2.up * jumpPower, ForceMode2D.Force);
         }
 
+        rb2d.AddForce(Vector2.up * jumpPower, ForceMode2D.Force);
     }
 
-    void EnableDoubleJump() {
-        canDoubleJump = true;
+    public void dealDamage(int damage) {
+        curHealth -= damage;
+    }
+
+    void die() {
+        SceneManager.LoadScene(0);
     }
 }

@@ -32,25 +32,27 @@ public class Player : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        animator.SetBool("Grounded", grounded);
-        animator.SetFloat("Speed", Mathf.Abs(rb2d.velocity.x));
+        if (!PauseMenu.isPaused) {
+            animator.SetBool("Grounded", grounded);
+            animator.SetFloat("Speed", Mathf.Abs(rb2d.velocity.x));
 
-        // Make sure the character is facing the correct way when moving
-        if (Input.GetAxis("Horizontal") < 0f)
-            transform.localScale = new Vector3(-1, 1, 1);
+            // Make sure the character is facing the correct way when moving
+            if (Input.GetAxis("Horizontal") < 0f)
+                transform.localScale = new Vector3(-1, 1, 1);
 
-        if (Input.GetAxis("Horizontal") > 0f)
-            transform.localScale = new Vector3(1, 1, 1);
+            if (Input.GetAxis("Horizontal") > 0f)
+                transform.localScale = new Vector3(1, 1, 1);
 
-        // Jump handler
-        if (Input.GetButtonDown("Jump") && !PauseMenu.isPaused && (grounded || canDoubleJump))
-            Jump();
+            // Jump handler
+            if (Input.GetButtonDown("Jump") && (grounded || canDoubleJump))
+                Jump();
 
-        if (curHealth > MAX_HEALTH)
-            curHealth = MAX_HEALTH;
+            if (curHealth > MAX_HEALTH)
+                curHealth = MAX_HEALTH;
 
-        if (curHealth <= 0)
-            die();
+            if (curHealth <= 0)
+                die();
+        }
     }
 
     private void FixedUpdate() {

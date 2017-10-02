@@ -20,9 +20,11 @@ public class Player : MonoBehaviour {
     public float jumpPower = 1;
     public bool canDoubleJump;
     public bool grounded;
+    private bool inStasis;
+    private Vector2 storedVelocity;
 
-	// Use this for initialization
-	void Start () {
+    // Use this for initialization
+    void Start () {
         rb2d = gameObject.GetComponent<Rigidbody2D>();
         animator = gameObject.GetComponent<Animator>();
         rb2d.freezeRotation = true;
@@ -44,7 +46,7 @@ public class Player : MonoBehaviour {
                 transform.localScale = new Vector3(1, 1, 1);
 
             // Jump handler
-            if (Input.GetButtonDown("Jump") && (grounded || canDoubleJump))
+            if (Input.GetButtonDown("Jump") && (grounded || canDoubleJump) && !inStasis)
                 Jump();
 
             if (curHealth > MAX_HEALTH)
@@ -52,6 +54,13 @@ public class Player : MonoBehaviour {
 
             if (curHealth <= 0)
                 die();
+
+            inStasis = Input.GetAxis("Stasis") > 0 && !grounded;
+
+            if (inStasis)
+                rb2d.constraints = RigidbodyConstraints2D.FreezePositionX | RigidbodyConstraints2D.FreezePositionY | RigidbodyConstraints2D.FreezeRotation;
+            else
+                rb2d.constraints = RigidbodyConstraints2D.FreezeRotation;
         }
     }
 
@@ -73,7 +82,8 @@ public class Player : MonoBehaviour {
         }
 
         // Moving the Player
-        rb2d.AddForce(Vector2.right * hSpeed);
+        if (!inStasis)
+            rb2d.AddForce(Vector2.right * hSpeed);
 
         // Limiting Speed
         if (rb2d.velocity.x > MAX_SPEED)

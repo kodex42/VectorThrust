@@ -12,10 +12,6 @@ public class GroundCheck : MonoBehaviour {
     private void OnTriggerEnter2D(Collider2D collision) {
         player.grounded = true;
         player.canDoubleJump = false;
-
-        if (collision.tag == "KillBounds") {
-            player.dealDamage(100);
-        }
     }
 
     private void OnTriggerStay2D(Collider2D collision) {

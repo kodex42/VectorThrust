@@ -11,6 +11,7 @@ public class CollideCheck : MonoBehaviour {
 
     private void OnTriggerEnter2D(Collider2D collision) {
         player.forceOutStasis = false;
+        player.timeManager.slowMo = false;
 
         if (collision.tag == "KillBounds") {
             player.dealDamage(100);
